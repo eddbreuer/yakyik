@@ -1,72 +1,46 @@
 import React, { Component } from 'react'
-import Comment from '../presentation/Comment'
-import Superagent from 'superagent'
+import { Comment, CreateComment  } from '../presentation'
+import { APImanager } from '../../utils'
 
 class Comments extends Component {
 
     constructor(){
         super()
-        this.state = {
-            comment: {
-                username: '',
-                body: '',
-                timestamp: ''
-            },
-            list: []
-        }
+            this.state = {
+                list: [ ]
+            }
     }
 
     componentDidMount(){
-        console.log('componentDidMount')
-        Superagent
-        .get('/api/comment')
-        .query(null)
-        .set('Accept', 'application/json')
-        .end((err, response) => {
+        // console.log('componentDidMount')
+        APImanager.get('/api/comment', null, (err, response) => {
             if(err){
-                alert('Error: '+err)
+                alert('Error in zones: '+err.message)
                 return
             }
-            console.log(JSON.stringify(response.body))
-            let results = response.body.results
-
+            // console.log(JSON.stringify(response))
             this.setState({
-                list: results
+                list: response.results
             })
         })
     }
 
-    submitComment(){
-        console.log('submitComment: '+JSON.stringify(this.state.list))
-        let updatedList = Object.assign([], this.state.list)
-        updatedList.push(this.state.comment)
+    submitComment(comment){
+        console.log('NewComment to update state: '+JSON.stringify(this.state.list))
+        // console.log('NewComment: '+JSON.stringify(comment))
+        let newComment = Object.assign({}, comment)
+        APImanager.post('/api/comment', newComment, (err, response) => {
+            if(err) {
+                alert('ERROR in New Zone: '+err.message)
+                return
+            }
 
-        this.setState({
-            list: updatedList
-        })
-    }
-
-    updateUsername(event){
-        //this.state.comment['username'] = event.target.value// WRONG!!
-        let updatedComment = Object.assign({}, this.state.comment)
-        updatedComment['username'] = event.target.value
-        this.setState({
-            comment: updatedComment
-        })
-    }
-
-    updateBody(event){
-        let updatedComment = Object.assign({}, this.state.comment)
-        updatedComment['body'] = event.target.value
-        this.setState({
-            comment: updatedComment
-        })
-    }
-    updateTime(event){
-        let updatedComment = Object.assign({}, this.state.comment)
-        updatedComment['time'] = event.target.value
-        this.setState({
-            comment: updatedComment
+            let updatedList = Object.assign([], this.state.list)
+            console.log('NewComment to update state: '+JSON.stringify(updatedList))
+            updatedList.push(response.result)
+            this.setState({
+                list: updatedList
+            })
         })
     }
 
@@ -76,6 +50,7 @@ class Comments extends Component {
             return (
                 <li key={i}>
                     <Comment currentComment={comment} />
+
                 </li>
             )
         })
@@ -88,11 +63,7 @@ class Comments extends Component {
                         {commentListItems}
                     </ul>
                     <div>
-                        <input onChange={this.updateUsername.bind(this)} className="form-control" type="text" placeholder="Username" /><br />
-                        <input onChange={this.updateBody.bind(this)} className="form-control" type="text" placeholder="Comment" /><br />
-                        <input onChange={this.updateTime.bind(this)} className="form-control" type="text" placeholder="Time" /><br />
-                        <button onClick={this.submitComment.bind(this)} className="btn btn-info">Submit Comment</button>
-
+                        <CreateComment onCreate={this.submitComment} />
                     </div>
                 </div>
             </div>

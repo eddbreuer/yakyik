@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
-import Zone from '../presentation/Zone'
-import Superagent from 'superagent'
+import { Zone, CreateZone  } from '../presentation'
+import { APImanager } from '../../utils'
 
 class Zones extends Component {
-
     constructor(){
         super()
         this.state = {
@@ -18,40 +17,36 @@ class Zones extends Component {
 
     componentDidMount(){
         console.log('componentDidMount')
-        Superagent
-        .get('/api/zone')
-        .query(null)
-        .set('Accept', 'application/json')
-        .end((err, response) => {
+        APImanager.get('/api/zone', null, (err, response) => {
             if(err){
-                alert('Error: '+err)
+                alert('Error in zones: '+err.message)
                 return
             }
-            console.log(JSON.stringify(response.body))
-            let results = response.body.results
 
             this.setState({
-                list: results
+                list: response.results
             })
         })
-    }
+     }
 
-    submitZone(){
-        let updatedList = Object.assign([], this.state.list)
-        updatedList.push(this.state.zone)
+    submitZone(zone){
+        let newZone = Object.assign({}, zone)
 
-        this.setState({
-            list: updatedList
+        APImanager.post('/api/zone', newZone, (err, response) => {
+            if(err) {
+                alert('ERROR in New Zone: '+err.message)
+                return
+            }
+            console.log('NewZone: '+JSON.stringify(response))
+            let updatedList = Object.assign([], this.state.list)
+            updatedList.push(response.result)
+            this.setState({
+                list: updatedList
+            })
+
+
         })
     }
-    newZone(event){
-        let newZone = Object.assign({}, this.state.zone)
-        newZone[event.target.id] = event.target.value
-        this.setState({
-            zone: newZone
-        })
-    }
-
 
     render(){
 
@@ -69,10 +64,7 @@ class Zones extends Component {
                     {listItems}
                 </ol>
                 <div>
-                    <input id="name" onChange={this.newZone.bind(this)} className="form-control" type="text" placeholder="Enter Zone Name" /><br />
-                    <input id="zipCodes" onChange={this.newZone.bind(this)} className="form-control" type="text" placeholder="Enter Zip Code" /><br />
-                    <input id="numComments" onChange={this.newZone.bind(this)} className="form-control" type="text" placeholder="Enter number of comments" /><br />
-                    <button onClick={this.submitZone.bind(this)} className="btn btn-danger">Submit Comment</button>
+                    <CreateZone onCreate={this.submitZone} />
                 </div>
             </div>
         )

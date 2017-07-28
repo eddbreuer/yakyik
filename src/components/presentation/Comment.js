@@ -6,8 +6,8 @@ class Comment extends Component {
         return(
             <div style={styles.container}>
                 <span>{this.props.currentComment.body}</span><br/>
-                <span >At {this.props.currentComment.timestamp} | </span>
-                <span style={styles.heading}><a style={styles.linkzones} href="#">{this.props.currentComment.username}</a></span>
+                <span style={styles.heading}><a style={styles.linkzones} href="#">{this.props.currentComment.username} | </a></span>
+                <span> At {this.props.currentComment.timestamp}</span>
             </div>
         )
     }

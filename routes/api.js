@@ -10,7 +10,7 @@ router.get('/:resource', function (req,res,next) {
 
     if(controller == null){
         res.json({
-            conformation: 'fail',
+            confirmation: 'fail',
             message: 'Invalid Resource Request: ' + resource
         })
         return
@@ -19,13 +19,13 @@ router.get('/:resource', function (req,res,next) {
     controller.find(req.query, function(err, results){
         if(err){
             res.json({
-                conformation: 'fail',
+                confirmation: 'fail',
                 message: err
             })
             return
         }
         res.json({
-            conformation: 'success',
+            confirmation: 'success',
             results: results
         })
     })
@@ -38,7 +38,7 @@ router.get('/:resource/:id', function(req, res, next){
     var controller = controllers[resource]
     if(controller == null){
         res.json({
-            conformation: 'fail',
+            confirmation: 'fail',
             message: 'Invalid Resource Request: ' + resource
         })
         return
@@ -67,7 +67,7 @@ router.post('/:resource', function(req,res,next){
     var controller = controllers[resource]
     if(controller == null){
         res.json({
-            conformation: 'fail',
+            confirmation: 'fail',
             message: 'Invalid Resource Request: ' + resource
         })
         return
@@ -81,7 +81,7 @@ router.post('/:resource', function(req,res,next){
         }
         res.json({
             confirmation: 'success',
-            message: result
+            result: result
         })
     })
 })
